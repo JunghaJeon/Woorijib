@@ -1,0 +1,156 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - 사용자 및 가족 데이터
+  postgres:
+    image: postgres:16-alpine
+    container_name: woorijib-postgres
+    environment:
+      POSTGRES_DB: woorijib
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - woorijib-network
+
+  # MongoDB - 질문 및 답변 데이터
+  mongodb:
+    image: mongo:7
+    container_name: woorijib-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: woorijib
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - woorijib-network
+
+  # Redis - 캐시 및 세션
+  redis:
+    image: redis:7-alpine
+    container_name: woorijib-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - woorijib-network
+    command: redis-server --appendonly yes
+
+  # Auth Service
+  auth-service:
+    build: ./services/auth-service
+    container_name: woorijib-auth-service
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: woorijib
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - woorijib-network
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+
+  # Family Service
+  family-service:
+    build: ./services/family-service
+    container_name: woorijib-family-service
+    environment:
+      PORT: 3002
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: woorijib
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
+    networks:
+      - woorijib-network
+    volumes:
+      - ./services/family-service:/app
+      - /app/node_modules
+
+  # Question Service
+  question-service:
+    build: ./services/question-service
+    container_name: woorijib-question-service
+    environment:
+      PORT: 3003
+      MONGODB_URI: mongodb://admin:admin@mongodb:27017/woorijib?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - woorijib-network
+    volumes:
+      - ./services/question-service:/app
+
+  # Media Service
+  media-service:
+    build: ./services/media-service
+    container_name: woorijib-media-service
+    environment:
+      PORT: 3004
+      NODE_ENV: development
+      AWS_REGION: ap-northeast-2
+      AWS_S3_BUCKET: woorijib-media
+    ports:
+      - "3004:3004"
+    networks:
+      - woorijib-network
+    volumes:
+      - ./services/media-service:/app
+      - /app/node_modules
+
+  # Notification Service
+  notification-service:
+    build: ./services/notification-service
+    container_name: woorijib-notification-service
+    environment:
+      PORT: 3005
+      NODE_ENV: development
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "3005:3005"
+    depends_on:
+      - redis
+    networks:
+      - woorijib-network
+    volumes:
+      - ./services/notification-service:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+
+networks:
+  woorijib-network:
+    driver: bridge

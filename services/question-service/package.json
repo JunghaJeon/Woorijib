@@ -1,0 +1,13 @@
+{
+  "name": "@woorijib/question-service",
+  "version": "1.0.0",
+  "description": "우리집 질문 시스템 서비스 - Python FastAPI",
+  "main": "main.py",
+  "scripts": {
+    "start": "uvicorn main:app --host 0.0.0.0 --port 3003",
+    "dev": "uvicorn main:app --reload --host 0.0.0.0 --port 3003",
+    "test": "pytest",
+    "lint": "flake8 ."
+  }
+}
+

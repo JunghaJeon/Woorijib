@@ -1,0 +1,45 @@
+{
+  "name": "woorijib",
+  "version": "1.0.0",
+  "description": "우리집 - 가족 소통 앱 모노레포",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "docker-compose up -d",
+    "down": "docker-compose down",
+    "logs": "docker-compose logs -f",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "docker-compose down -v && rm -rf node_modules apps/*/node_modules services/*/node_modules",
+    "install:all": "npm install && npm install --workspaces"
+  },
+  "keywords": [
+    "family",
+    "communication",
+    "react-native",
+    "microservices"
+  ],
+  "author": "Woorijib Team",
+  "license": "PROPRIETARY",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.1.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+}
