@@ -7,7 +7,7 @@ import Complete from './pages/Complete';
 
 export default function App() {
   return (
-    <BrowserRouter basename="/woorijib-demo">
+    <BrowserRouter basename="/Woorijib">
       <MobileFrame>
         <Routes>
           <Route path="/" element={<Hero />} />
