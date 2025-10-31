@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { allPersonas } from '../data/personas';
+import {
+  multigenerationRecords,
+  newlywedRecords,
+  adultChildRecords,
+  teenRecords
+} from '../data/recordData';
 
-type TabType = 'home' | 'question' | 'record' | 'family';
+type TabType = 'home' | 'calendar' | 'record' | 'family';
 
 export default function AppDemo() {
   const { personaId } = useParams<{ personaId: string }>();
@@ -18,16 +24,15 @@ export default function AppDemo() {
 
   return (
     <div className="h-full bg-gray-50 flex flex-col">
-      {/* 헤더 */}
-      <div className={`bg-gradient-to-r ${persona.gradient} p-4 shadow-sm flex-shrink-0`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">{persona.emoji} {persona.title}</h1>
-            <p className="text-sm text-gray-700">{persona.subtitle}</p>
-          </div>
+      {/* 헤더 - Safe area 고려 */}
+      <div className={`bg-gradient-to-r ${persona.gradient} px-4 pt-12 pb-3 shadow-sm flex-shrink-0`}>
+        <div className="flex items-start justify-between gap-2">
+          <h1 className="text-sm font-bold text-gray-800 leading-snug break-words flex-1">
+            <span className="text-lg">{persona.emoji}</span> {persona.title}
+          </h1>
           <button
             onClick={() => navigate(`/complete/${personaId}`)}
-            className="bg-white text-purple-600 font-semibold px-4 py-2 rounded-lg text-sm shadow-md hover:shadow-lg transition-all"
+            className="bg-white text-purple-600 font-semibold px-2.5 py-1 rounded-lg text-xs shadow-sm hover:shadow-md transition-all flex-shrink-0 whitespace-nowrap"
           >
             체험 완료
           </button>
@@ -37,7 +42,7 @@ export default function AppDemo() {
       {/* 탭별 내용 영역 */}
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'home' && <HomeTabContent persona={persona} />}
-        {activeTab === 'question' && <QuestionTabContent persona={persona} />}
+        {activeTab === 'calendar' && <CalendarTabContent persona={persona} />}
         {activeTab === 'record' && <RecordTabContent persona={persona} />}
         {activeTab === 'family' && <FamilyTabContent persona={persona} />}
       </div>
@@ -52,10 +57,10 @@ export default function AppDemo() {
             onClick={() => setActiveTab('home')}
           />
           <TabButton
-            icon="💬"
-            label="질문"
-            active={activeTab === 'question'}
-            onClick={() => setActiveTab('question')}
+            icon="📅"
+            label="캘린더"
+            active={activeTab === 'calendar'}
+            onClick={() => setActiveTab('calendar')}
           />
           <TabButton
             icon="📋"
@@ -108,53 +113,63 @@ function HomeTabContent({ persona }: { persona: any }) {
   ];
 
   return (
-    <div className="p-5 space-y-5">
-      {/* 파몽이 - 상단으로 이동, 더 크고 귀엽게 */}
-      <div
-        onClick={() => setShowPetModal(true)}
-        className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-3xl p-6 shadow-sm cursor-pointer hover:shadow-md transition-all"
-      >
-        <div className="text-center">
-          <div className="text-8xl mb-3 animate-bounce">🐶</div>
-          <h3 className="text-lg font-bold text-gray-800 mb-1">파몽이</h3>
-          <p className="text-sm text-gray-600 mb-4">오늘도 모두 답변해주세요!</p>
-
-          <div className="bg-white/70 rounded-2xl p-3">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600">건강도</span>
-              <span className="text-sm font-bold text-amber-600">85%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div className="bg-gradient-to-r from-amber-400 to-orange-400 h-2.5 rounded-full transition-all" style={{ width: '85%' }}></div>
-            </div>
-          </div>
+    <div className="p-4 space-y-3">
+      {/* 오늘의 질문 - 메인 포커스 */}
+      <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100 rounded-2xl p-4 shadow-md">
+        <div className="text-center mb-3">
+          <p className="text-xs text-purple-600 font-medium mb-1">📅 2024년 10월 30일</p>
+          <h2 className="text-lg font-bold text-gray-800">💭 오늘의 질문</h2>
         </div>
+
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-3 shadow-sm">
+          <p className="text-base text-gray-800 font-semibold text-center leading-relaxed">
+            {persona.sampleQuestion.text}
+          </p>
+        </div>
+
+        <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+          💬 답변하기
+        </button>
       </div>
 
-      {/* 가족 감정 상태 - 카드 스타일 개선 */}
-      <div className="bg-white rounded-3xl p-5 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4">✨ 오늘 우리 가족은요</h2>
-        <div className="space-y-3">
+      {/* 가족 감정 상태 - 작게 서브로 */}
+      <div className="bg-white rounded-xl p-3 shadow-sm">
+        <h3 className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1">
+          <span>✨</span>
+          <span>오늘 우리 가족은요</span>
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
           {persona.members.map((member: any, idx: number) => (
             <div
               key={idx}
-              className={`${moodColors[idx % moodColors.length]} rounded-2xl p-4 transition-all hover:scale-[1.02]`}
+              className={`${moodColors[idx % moodColors.length]} rounded-lg p-2 flex items-center justify-between`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-4xl">{member.emoji}</span>
-                  <div>
-                    <p className="font-bold text-gray-800">{member.name}</p>
-                    <p className="text-xs text-gray-600">{member.role} · {member.age}세</p>
-                  </div>
-                </div>
-                <div className="text-center bg-white/70 rounded-xl px-3 py-2">
-                  <span className="text-3xl block">😊</span>
-                  <p className="text-xs text-gray-600 font-medium mt-1">기쁨</p>
-                </div>
-              </div>
+              <p className="font-semibold text-gray-800 text-xs truncate flex-1">{member.name}</p>
+              <span className="text-2xl ml-1">😊</span>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* 파몽이 - 작게 서브로 */}
+      <div
+        onClick={() => setShowPetModal(true)}
+        className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 shadow-sm cursor-pointer hover:shadow-md transition-all"
+      >
+        <div className="flex items-center gap-2">
+          <div className="text-4xl">🐶</div>
+          <div className="flex-1">
+            <h4 className="text-xs font-bold text-gray-800">파몽이</h4>
+            <p className="text-xs text-gray-600">모두 답변하면 더 행복해져요!</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-bold text-amber-600">85%</p>
+          </div>
+        </div>
+        <div className="mt-2">
+          <div className="w-full bg-gray-200 rounded-full h-1.5">
+            <div className="bg-gradient-to-r from-amber-400 to-orange-400 h-1.5 rounded-full transition-all" style={{ width: '85%' }}></div>
+          </div>
         </div>
       </div>
 
@@ -200,39 +215,173 @@ function HomeTabContent({ persona }: { persona: any }) {
   );
 }
 
-// 질문 탭 내용
-function QuestionTabContent({ persona }: { persona: any }) {
+// 캘린더 탭 내용
+function CalendarTabContent({ persona }: { persona: any }) {
+  // 페르소나별 미션
+  const getMissionsForPersona = () => {
+    switch (persona.id) {
+      case 'newlywed':
+        return [
+          { icon: '🍽️', text: '좋아하는 음식 함께 만들어 먹기', completed: false },
+          { icon: '📸', text: '데이트 사진 찍고 추억 공유하기', completed: true },
+          { icon: '💌', text: '서로에게 손편지 쓰기', completed: false }
+        ];
+      case 'adult-child':
+        return [
+          { icon: '🌅', text: '각자 찍은 하늘 사진 공유하기', completed: false },
+          { icon: '📱', text: '부모님께 영상통화로 안부 전하기', completed: true },
+          { icon: '☕', text: '부모님과 차 한잔 하며 대화하기', completed: false }
+        ];
+      case 'teenager':
+        return [
+          { icon: '🍕', text: '자녀가 좋아하는 음식 다 같이 만들어 먹기', completed: false },
+          { icon: '📱', text: '부모님께 스마트폰 꿀팁 1가지 알려드리기', completed: true },
+          { icon: '🎮', text: '가족 게임 대회 열기', completed: false }
+        ];
+      case 'multigen':
+        return [
+          { icon: '📖', text: '할머니 옛날 이야기 듣고 기록하기', completed: false },
+          { icon: '🎨', text: '3세대가 함께 그림 그리기', completed: true },
+          { icon: '🍪', text: '할머니와 손주가 함께 요리하기', completed: false }
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const missions = getMissionsForPersona();
+
+  // 10월 2024 캘린더 데이터
+  const daysInMonth = 31;
+  const firstDayOfWeek = 2; // 10월 1일은 화요일 (0=일, 1=월, 2=화)
+  const today = 30;
+
+  // 일정 데이터
+  const events: { [key: number]: { title: string; type: 'family' | 'birthday' | 'trip' } } = {
+    5: { title: '가족 여행', type: 'trip' },
+    12: { title: '엄마 생일', type: 'birthday' },
+    20: { title: '가족 모임', type: 'family' },
+    25: { title: '할머니 생신', type: 'birthday' }
+  };
+
+  const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+
   return (
     <div className="p-4 space-y-4">
-      <div className="bg-white rounded-2xl p-5 shadow-md">
-        <div className="text-center mb-4">
-          <p className="text-sm text-gray-500 mb-1">📅 2024년 10월 30일</p>
-          <h2 className="text-xl font-bold text-gray-800">💭 오늘의 질문</h2>
+      {/* 이달의 미션 */}
+      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-800">🎯 이달의 가족 미션</h2>
+          <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full font-semibold">
+            {missions.filter(m => m.completed).length}/{missions.length} 완료
+          </span>
         </div>
-        <div className="bg-purple-50 rounded-xl p-4 mb-4">
-          <p className="text-lg text-gray-800 font-medium text-center">
-            {persona.sampleQuestion.text}
-          </p>
-        </div>
-        <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 rounded-xl shadow-lg">
-          💬 답변하기
-        </button>
-      </div>
-
-      {/* 가족 답변 현황 */}
-      <div className="bg-white rounded-2xl p-5 shadow-md">
-        <h3 className="font-semibold text-gray-800 mb-3">가족 답변 현황</h3>
         <div className="space-y-2">
-          {persona.members.map((member: any, idx: number) => (
-            <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{member.emoji}</span>
-                <span className="font-medium text-gray-700">{member.name}</span>
-              </div>
-              <span className="text-green-500">✅ 완료</span>
+          {missions.map((mission, idx) => (
+            <div
+              key={idx}
+              className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+                mission.completed
+                  ? 'bg-green-50 border border-green-200'
+                  : 'bg-white border border-gray-200'
+              }`}
+            >
+              <span className="text-2xl">{mission.icon}</span>
+              <p className={`flex-1 text-sm ${mission.completed ? 'text-gray-500 line-through' : 'text-gray-800 font-medium'}`}>
+                {mission.text}
+              </p>
+              {mission.completed ? (
+                <span className="text-green-500 text-sm">✅</span>
+              ) : (
+                <button className="text-purple-600 text-xs font-semibold hover:text-purple-700">
+                  시작하기
+                </button>
+              )}
             </div>
           ))}
         </div>
+      </div>
+
+      {/* 캘린더 */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-800">📅 10월 2024</h2>
+          <div className="flex gap-2">
+            <button className="text-gray-400 hover:text-gray-600">◀</button>
+            <button className="text-gray-400 hover:text-gray-600">▶</button>
+          </div>
+        </div>
+
+        {/* 요일 헤더 */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {weekDays.map((day, idx) => (
+            <div key={idx} className="text-center text-xs font-semibold text-gray-500 py-2">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* 날짜 그리드 */}
+        <div className="grid grid-cols-7 gap-1">
+          {/* 빈 칸 (첫째 주 시작 전) */}
+          {Array.from({ length: firstDayOfWeek }).map((_, idx) => (
+            <div key={`empty-${idx}`} className="aspect-square"></div>
+          ))}
+
+          {/* 날짜 */}
+          {Array.from({ length: daysInMonth }).map((_, idx) => {
+            const day = idx + 1;
+            const event = events[day];
+            const isToday = day === today;
+
+            return (
+              <div
+                key={day}
+                className={`aspect-square flex flex-col items-center justify-center rounded-lg text-sm relative ${
+                  isToday
+                    ? 'bg-purple-500 text-white font-bold'
+                    : event
+                    ? 'bg-blue-50 text-gray-800 font-semibold'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <span className="text-xs">{day}</span>
+                {event && !isToday && (
+                  <div className="absolute bottom-0.5">
+                    <div className={`w-1 h-1 rounded-full ${
+                      event.type === 'birthday' ? 'bg-pink-500' :
+                      event.type === 'trip' ? 'bg-blue-500' :
+                      'bg-green-500'
+                    }`}></div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 이벤트 범례 */}
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <p className="text-xs font-semibold text-gray-600 mb-2">예정된 일정</p>
+          <div className="space-y-1.5">
+            {Object.entries(events).map(([day, event]) => (
+              <div key={day} className="flex items-center gap-2 text-xs">
+                <div className={`w-2 h-2 rounded-full ${
+                  event.type === 'birthday' ? 'bg-pink-500' :
+                  event.type === 'trip' ? 'bg-blue-500' :
+                  'bg-green-500'
+                }`}></div>
+                <span className="text-gray-600">{day}일</span>
+                <span className="text-gray-800 font-medium">{event.title}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 일정 추가 버튼 */}
+        <button className="w-full mt-4 border-2 border-dashed border-gray-300 text-gray-500 py-3 rounded-lg hover:border-purple-400 hover:text-purple-600 transition-colors text-sm font-medium">
+          + 새 일정 추가
+        </button>
       </div>
     </div>
   );
@@ -240,49 +389,154 @@ function QuestionTabContent({ persona }: { persona: any }) {
 
 // 기록 탭 내용
 function RecordTabContent({ persona }: { persona: any }) {
+  const [expandedRecordId, setExpandedRecordId] = useState<string | null>(null);
+
+  // 페르소나에 맞는 기록 데이터 가져오기
+  const getRecordsForPersona = () => {
+    switch (persona.id) {
+      case 'multigen':
+        return multigenerationRecords;
+      case 'newlywed':
+        return newlywedRecords;
+      case 'adult-child':
+        return adultChildRecords;
+      case 'teenager':
+        return teenRecords;
+      default:
+        // 기본 fallback
+        return [
+          {
+            id: 'q_today',
+            date: '2024.10.30',
+            dateLabel: '오늘',
+            question: persona.sampleQuestion,
+            completionRate: { completed: persona.members.length, total: persona.members.length },
+            answers: persona.members.map((m: any) => ({
+              memberName: m.name,
+              memberEmoji: m.emoji,
+              answer: m.sampleAnswer
+            }))
+          }
+        ];
+    }
+  };
+
+  const records = getRecordsForPersona();
+
+  const toggleRecord = (recordId: string) => {
+    setExpandedRecordId(expandedRecordId === recordId ? null : recordId);
+  };
+
   return (
-    <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold text-gray-800">📋 질문 기록</h2>
-
-      {/* 오늘 질문 */}
-      <div className="bg-white rounded-2xl p-5 shadow-md">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <span className="text-sm text-purple-600 font-semibold">오늘</span>
-            <p className="text-xs text-gray-500">2024.10.30</p>
-          </div>
-          <span className="text-green-500 text-sm font-semibold">✅ {persona.members.length}/{persona.members.length}</span>
-        </div>
-        <p className="text-gray-800 font-medium mb-3">{persona.sampleQuestion.text}</p>
-        <div className="flex gap-2">
-          {persona.members.map((member: any, idx: number) => (
-            <span key={idx} className="text-2xl">{member.emoji}</span>
-          ))}
-        </div>
+    <div className="p-4 space-y-2">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xl font-bold text-gray-800">📋 우리 가족 이야기</h2>
+        <span className="text-sm text-gray-500">{records.length}개의 기록</span>
       </div>
 
-      {/* 과거 질문들 */}
-      <div className="bg-white rounded-2xl p-5 shadow-md">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <span className="text-sm text-gray-600 font-semibold">어제</span>
-            <p className="text-xs text-gray-500">2024.10.29</p>
+      {records.map((record) => (
+        <div key={record.id} className="bg-white rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md">
+          {/* 질문 헤더 - 클릭 가능 */}
+          <div
+            onClick={() => toggleRecord(record.id)}
+            className="p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-start justify-between mb-2">
+              <p className="text-xs text-gray-500">{record.date}</p>
+              <div className="flex items-center gap-1.5">
+                <span className="text-gray-600">👥</span>
+                <span className={`text-xs font-semibold ${
+                  record.completionRate.completed === record.completionRate.total
+                    ? 'text-green-500'
+                    : 'text-yellow-500'
+                }`}>
+                  {record.completionRate.completed}/{record.completionRate.total}
+                </span>
+                <span className={`text-gray-400 text-xs transition-transform ${expandedRecordId === record.id ? 'rotate-180' : ''}`}>
+                  ▼
+                </span>
+              </div>
+            </div>
+            <p className="text-gray-800 font-medium text-sm">{record.question.text}</p>
           </div>
-          <span className="text-green-500 text-sm font-semibold">✅ {persona.members.length}/{persona.members.length}</span>
-        </div>
-        <p className="text-gray-800 font-medium">오늘 가장 감사했던 순간은?</p>
-      </div>
 
-      <div className="bg-white rounded-2xl p-5 shadow-md">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <span className="text-sm text-gray-600 font-semibold">그저께</span>
-            <p className="text-xs text-gray-500">2024.10.28</p>
-          </div>
-          <span className="text-yellow-500 text-sm font-semibold">⏳ {persona.members.length - 1}/{persona.members.length}</span>
+          {/* 답변 상세 - 확장 시 표시 */}
+          {expandedRecordId === record.id && record.answers.length > 0 && (
+            <div className="border-t border-gray-100 bg-gradient-to-b from-gray-50 to-white">
+              <div className="p-5 space-y-4">
+                <h3 className="text-sm font-bold text-gray-700 mb-3">💬 가족 답변</h3>
+                {record.answers.map((answerData: any, idx: number) => (
+                  <div key={idx} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    {/* 답변자 정보 */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-3xl">{answerData.memberEmoji}</span>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-800">{answerData.memberName}</p>
+                        <p className="text-xs text-gray-500">{answerData.answer.time}</p>
+                      </div>
+                      {answerData.answer.privacy && (
+                        <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
+                          🔒 {answerData.answer.privacy === 'parents_only' ? '부모만' : '비공개'}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* 답변 텍스트 */}
+                    <div className="mb-3">
+                      <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                        {answerData.answer.text}
+                      </p>
+                    </div>
+
+                    {/* 음성 답변 */}
+                    {answerData.answer.voice && (
+                      <div className="mb-3">
+                        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3 flex items-center gap-2">
+                          <span className="text-purple-600">{answerData.answer.voice}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 사진 */}
+                    {answerData.answer.photo && (
+                      <div className="mb-3">
+                        <div className="bg-blue-50 rounded-lg p-3 flex items-center gap-2">
+                          <span className="text-blue-600">{answerData.answer.photo}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 스티커 */}
+                    {answerData.answer.stickers && answerData.answer.stickers.length > 0 && (
+                      <div className="mb-3">
+                        <div className="flex gap-2 flex-wrap">
+                          {answerData.answer.stickers.map((sticker: string, sIdx: number) => (
+                            <span key={sIdx} className="text-2xl">{sticker}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 댓글 */}
+                    {answerData.answer.comment && (
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        <p className="text-sm text-gray-600 italic">
+                          💭 {answerData.answer.comment}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        <p className="text-gray-800 font-medium">이번 주 가장 기억에 남는 일은?</p>
-      </div>
+      ))}
+
+      {/* 더보기 버튼 (향후 확장용) */}
+      <button className="w-full py-3 text-gray-500 text-sm hover:text-purple-600 transition-colors">
+        더 많은 기록 보기 →
+      </button>
     </div>
   );
 }

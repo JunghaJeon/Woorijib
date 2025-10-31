@@ -5,51 +5,43 @@ export default function PersonaSelect() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-indigo-50 to-purple-50 p-6 fade-in">
+    <div className="min-h-full bg-gradient-to-br from-indigo-50 to-purple-50 p-5 fade-in">
       {/* Header */}
-      <div className="pt-8 pb-6 text-center">
+      <div className="pt-6 pb-4 text-center">
         <button
           onClick={() => navigate('/')}
-          className="absolute top-6 left-6 text-2xl"
+          className="absolute top-5 left-5 text-2xl"
         >
           ←
         </button>
 
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          💭 어떤 가족의 이야기가
-          <br />
-          궁금하세요?
+        <h1 className="text-xl font-bold text-gray-800">
+          💭 어떤 가족의 이야기가 궁금하세요?
         </h1>
-        <p className="text-sm text-gray-600">
-          우리 가족과 비슷한 유형을 선택해보세요
-        </p>
       </div>
 
-      {/* Persona Cards */}
-      <div className="space-y-4 mb-6">
+      {/* Persona Cards - Compact Grid */}
+      <div className="space-y-3 mb-5">
         {allPersonas.map((persona) => (
           <button
             key={persona.id}
             onClick={() => navigate(`/demo/${persona.id}`)}
-            className={`w-full bg-gradient-to-r ${persona.gradient} p-6 rounded-2xl shadow-md hover:shadow-xl transition-all hover:scale-105 text-left`}
+            className={`w-full bg-gradient-to-r ${persona.gradient} p-4 rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] text-left`}
           >
-            <div className="flex items-center mb-3">
-              <span className="text-4xl mr-4">{persona.emoji}</span>
-              <div>
-                <h3 className="text-xl font-bold text-gray-800">
-                  {persona.title}
-                </h3>
-                <p className="text-sm text-gray-600">{persona.subtitle}</p>
-              </div>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">{persona.emoji}</span>
+              <h3 className="text-lg font-bold text-gray-800">
+                {persona.title}
+              </h3>
             </div>
-            <p className="text-sm text-gray-700 mb-3">
+            <p className="text-xs text-gray-700 mb-2 leading-relaxed">
               {persona.description}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {persona.highlights.map((highlight, idx) => (
                 <span
                   key={idx}
-                  className="text-xs bg-white/50 px-3 py-1 rounded-full"
+                  className="text-xs bg-white/60 px-2 py-0.5 rounded-full"
                 >
                   {highlight}
                 </span>

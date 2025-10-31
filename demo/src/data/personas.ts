@@ -79,59 +79,57 @@ export const newlywedPersona: Persona = {
   ]
 };
 
-// 페르소나 2: 우리아이 성장앨범
-export const infantPersona: Persona = {
-  id: 'infant',
-  title: '우리아이 성장앨범',
-  subtitle: '영유아 자녀 가족',
-  emoji: '👶',
-  description: '아이의 소중한 첫걸음을 기록하는 가족',
+// 페르소나 2: 어른이 되어 나누는 대화
+export const adultChildPersona: Persona = {
+  id: 'adult-child',
+  title: '어른이 되어 나누는 대화',
+  subtitle: '성인 자녀 + 부모',
+  emoji: '🤝',
+  description: '어른이 되어서야 이해하게 되는 부모님과의 진솔한 대화',
   gradient: 'from-blue-100 via-sky-100 to-blue-200',
   members: [
     {
-      name: '엄마',
-      age: 32,
-      role: '엄마',
-      emoji: '👩',
-      ageGroup: 'adult',
-      sampleAnswer: {
-        text: '오늘 처음으로 "엄마"라고 불렀어요! 눈물이 날 만큼 감동이었어요 😭❤️\n\n아침에 기저귀 갈아주다가 갑자기 "엄마~" 하는 소리가 들려서 깜짝 놀랐어요. 몇 번이고 다시 불러달라고 했답니다.',
-        time: '14:20'
-      }
-    },
-    {
-      name: '아빠',
-      age: 34,
-      role: '아빠',
+      name: '아버지',
+      age: 58,
+      role: '아버지',
       emoji: '👨',
       ageGroup: 'adult',
       sampleAnswer: {
-        text: '아내한테 영상 받았는데 정말 기적 같은 순간이네요. 퇴근하자마자 달려갑니다!\n\n나도 지우야 "아빠" 불러줄 날 기대하면서 오늘도 열심히 일했어요 ㅎㅎ',
-        time: '15:40',
-        comment: '지은이 고생 많았어요 👏'
+        text: '회사 다닐 때는 너한테 제대로 된 아빠 노릇을 못한 것 같아 늘 미안했어.\n\n주말에도 일하느라 네 운동회도 못 가고... 그래도 너를 보면서 희망을 가졌단다. 지금 네가 이렇게 잘 자라준 게 정말 자랑스러워.',
+        time: '21:00'
       }
     },
     {
-      name: '지우',
-      age: 2,
-      role: '아이',
-      emoji: '👶',
-      ageGroup: 'child',
+      name: '어머니',
+      age: 56,
+      role: '어머니',
+      emoji: '👩',
+      ageGroup: 'adult',
       sampleAnswer: {
-        text: '(엄마가 대신 작성)\n오늘은 처음으로 "엄마"라고 말했어요!\n그리고 혼자서 컵에 있는 물도 마셨답니다 👏',
-        stickers: ['⭐', '❤️', '😊', '👶'],
-        time: '20:00'
+        text: '민준아, 엄마도 너를 키우면서 많이 배웠어. 완벽한 엄마가 되려고 했는데 그게 오히려 너한테 부담이었을 수도 있겠다 싶더라.\n\n이제 어른이 된 네가 엄마 마음을 조금은 이해해줄 것 같아서 이런 얘기도 할 수 있게 됐네. 고마워.',
+        time: '21:30'
+      }
+    },
+    {
+      name: '민준',
+      age: 28,
+      role: '아들',
+      emoji: '👦',
+      ageGroup: 'adult',
+      sampleAnswer: {
+        text: '어렸을 때는 왜 아빠가 집에 안 계시는지, 엄마가 왜 그렇게 엄격한지 이해가 안 됐어요.\n\n근데 제가 사회생활 하면서 부모님이 얼마나 힘드셨을지 조금씩 알 것 같아요. 늦었지만 이렇게라도 대화할 수 있어서 좋아요. 사랑합니다.',
+        time: '22:00'
       }
     }
   ],
   sampleQuestion: {
-    text: '오늘 아이가 새로 배운 것은?',
-    category: 'growth'
+    text: '어른이 되고 나서 부모님을 이해하게 된 순간은?',
+    category: 'emotion'
   },
   highlights: [
-    '📸 성장 순간 실시간 기록',
-    '👨‍👩‍👧 부모 협력 육아 일지',
-    '🎨 그림/스티커로 아이 참여'
+    '💬 세대를 넘어 진솔한 소통',
+    '❤️ 늦었지만 나누는 이해와 공감',
+    '🌱 함께 성장하는 가족 관계'
   ]
 };
 
@@ -250,7 +248,7 @@ export const multigenerationPersona: Persona = {
 
 export const allPersonas: Persona[] = [
   newlywedPersona,
-  infantPersona,
+  adultChildPersona,
   teenPersona,
   multigenerationPersona
 ];

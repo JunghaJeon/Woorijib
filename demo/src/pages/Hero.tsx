@@ -10,7 +10,6 @@ export default function Hero() {
         <div className="text-9xl mb-4 bounce-slow">
           🏡
         </div>
-        <p className="text-sm text-amber-700 font-semibold">우리</p>
       </div>
 
       {/* Logo */}
@@ -43,11 +42,6 @@ export default function Hero() {
           로그인
         </button>
       </div>
-
-      {/* Bottom Text */}
-      <p className="mt-8 text-gray-500 text-sm">
-        👇 1분이면 충분해요. 로그인 없이 바로 체험!
-      </p>
     </div>
   );
 }
